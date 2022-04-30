@@ -38,7 +38,7 @@ h1{
 
 .about, .education, .skills{
     background-color:#222222;
-    color:#db710a;
+    color:#db71a0;
 }
 
 .about h2, .education h2, .skills h2{
@@ -135,7 +135,7 @@ li:first-child{
 footer{
     background:#222222;
     padding: 10px 20px;
-    color:#71DB77;
+    color:#71d5db;
 }
 
 
