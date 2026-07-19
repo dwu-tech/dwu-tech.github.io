@@ -5,7 +5,6 @@
   --text: #1c1f23;
   --muted: #656d76;
   --accent: #2f6fed;
-  --accent-soft: #e8f0fe;
   --pr: #1a7f4b;
   --pr-soft: #e6f5ec;
   --shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
@@ -20,7 +19,6 @@
     --text: #e6e9ee;
     --muted: #9aa4b2;
     --accent: #5b8dff;
-    --accent-soft: #1b2740;
     --pr: #4ecb8a;
     --pr-soft: #14311f;
     --shadow: none;
@@ -34,11 +32,21 @@
   --text: #e6e9ee;
   --muted: #9aa4b2;
   --accent: #5b8dff;
-  --accent-soft: #1b2740;
   --pr: #4ecb8a;
   --pr-soft: #14311f;
   --shadow: none;
 }
+
+/* Accent-soft is derived from the current accent + surface, so it adapts to both
+   the light/dark mode and the selected color theme. */
+:root { --accent-soft: color-mix(in srgb, var(--accent) 14%, var(--surface)); }
+
+/* Color themes (accent). Default (no attribute) is blue from the mode above. */
+:root[data-accent="green"]  { --accent: #16a34a; }
+:root[data-accent="violet"] { --accent: #8b5cf6; }
+:root[data-accent="amber"]  { --accent: #f59e0b; }
+:root[data-accent="rose"]   { --accent: #e11d48; }
+:root[data-accent="teal"]   { --accent: #0d9488; }
 
 * { box-sizing: border-box; }
 
@@ -92,6 +100,14 @@ body {
   vertical-align: middle;
 }
 .theme-btn:hover { border-color: var(--accent); }
+.swatches { display: inline-flex; gap: 6px; margin-left: 16px; vertical-align: middle; }
+.swatch {
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid var(--border); background: var(--sw);
+  padding: 0; cursor: pointer; transition: transform .1s;
+}
+.swatch:hover { transform: scale(1.18); }
+.swatch.active { border-color: var(--surface); box-shadow: 0 0 0 2px var(--sw); }
 
 /* Layout */
 .container { max-width: 1100px; margin: 0 auto; padding: 24px 20px 60px; }

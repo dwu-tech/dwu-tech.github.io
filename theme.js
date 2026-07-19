@@ -29,5 +29,35 @@
     updateBtn();
   };
 
-  document.addEventListener('DOMContentLoaded', updateBtn);
+  /* ---- accent color theme ---- */
+  function currentAccent() { return localStorage.getItem('accent') || 'default'; }
+  function applyAccent(a) {
+    if (a && a !== 'default') root.setAttribute('data-accent', a);
+    else root.removeAttribute('data-accent');
+  }
+  function updateSwatches() {
+    var a = currentAccent();
+    var els = document.querySelectorAll('.swatch');
+    for (var i = 0; i < els.length; i++) {
+      els[i].classList.toggle('active', els[i].getAttribute('data-accent') === a);
+    }
+  }
+  window.setAccent = function (a) {
+    localStorage.setItem('accent', a);
+    applyAccent(a);
+    updateSwatches();
+  };
+
+  applyAccent(currentAccent()); // set before first paint
+
+  document.addEventListener('DOMContentLoaded', function () {
+    updateBtn();
+    updateSwatches();
+    var els = document.querySelectorAll('.swatch');
+    for (var i = 0; i < els.length; i++) {
+      els[i].addEventListener('click', function () {
+        window.setAccent(this.getAttribute('data-accent'));
+      });
+    }
+  });
 })();
