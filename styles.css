@@ -266,8 +266,8 @@ td a:hover { text-decoration: underline; }
 .muted { color: var(--muted); }
 
 /* Chart */
-.chart-wrap { position: relative; margin-top: 14px; }
-#chart { width: 100%; height: auto; display: block; }
+.chart-wrap { position: relative; margin-top: 14px; overflow-x: auto; }
+#chart { display: block; }
 .chart-axis { stroke: var(--border); stroke-width: 1; }
 .chart-grid { stroke: var(--border); stroke-width: 1; stroke-dasharray: 3 4; opacity: .6; }
 .chart-label { fill: var(--muted); font-size: 11px; }

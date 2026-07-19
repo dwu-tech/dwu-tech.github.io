@@ -6,8 +6,8 @@
     <title>Darren Wu · Track &amp; Field Results</title>
     <meta name="description" content="Complete track and field meet results for Darren Wu — including meets not listed on Athletic.net." />
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css" />
-    <script src="theme.js"></script>
+    <link rel="stylesheet" href="styles.css?v=3" />
+    <script src="theme.js?v=2"></script>
 </head>
 <body>
     <header class="site-header">
@@ -17,12 +17,12 @@
                 <a href="index.html" class="active">Results</a>
                 <a href="https://www.athletic.net/athlete/31853361/track-and-field/all" target="_blank" rel="noopener">Athletic.net</a>
                 <span class="swatches" id="swatches" role="group" aria-label="Accent color">
-                    <button class="swatch" type="button" data-accent="default" title="Blue" style="--sw:#3b7bed"></button>
-                    <button class="swatch" type="button" data-accent="green" title="Green" style="--sw:#16a34a"></button>
-                    <button class="swatch" type="button" data-accent="violet" title="Violet" style="--sw:#8b5cf6"></button>
-                    <button class="swatch" type="button" data-accent="amber" title="Amber" style="--sw:#f59e0b"></button>
-                    <button class="swatch" type="button" data-accent="rose" title="Rose" style="--sw:#e11d48"></button>
-                    <button class="swatch" type="button" data-accent="teal" title="Teal" style="--sw:#0d9488"></button>
+                    <button class="swatch" type="button" onclick="setAccent('default')" data-accent="default" title="Blue" style="--sw:#3b7bed"></button>
+                    <button class="swatch" type="button" onclick="setAccent('green')" data-accent="green" title="Green" style="--sw:#16a34a"></button>
+                    <button class="swatch" type="button" onclick="setAccent('violet')" data-accent="violet" title="Violet" style="--sw:#8b5cf6"></button>
+                    <button class="swatch" type="button" onclick="setAccent('amber')" data-accent="amber" title="Amber" style="--sw:#f59e0b"></button>
+                    <button class="swatch" type="button" onclick="setAccent('rose')" data-accent="rose" title="Rose" style="--sw:#e11d48"></button>
+                    <button class="swatch" type="button" onclick="setAccent('teal')" data-accent="teal" title="Teal" style="--sw:#0d9488"></button>
                 </span>
                 <button id="theme-toggle" class="theme-btn" type="button" onclick="toggleTheme()" aria-label="Toggle dark mode">🌙</button>
             </div>
@@ -32,7 +32,6 @@
     <main class="container">
         <section class="card">
             <h1>Track &amp; Field Results</h1>
-            <p class="subtitle">Every meet, every mark — the complete record, including meets that never made it onto Athletic.net.</p>
             <div class="stats" id="stats"></div>
         </section>
 
@@ -105,8 +104,8 @@
                         <div class="control">
                             <label>View</label>
                             <div class="toggle-group">
-                                <button data-view="table" class="active">Table</button>
-                                <button data-view="seasons">By season</button>
+                                <button data-view="table">Table</button>
+                                <button data-view="seasons" class="active">By season</button>
                             </div>
                         </div>
                     </div>
@@ -131,6 +130,6 @@
     </footer>
 
     <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
-    <script src="app.js"></script>
+    <script src="app.js?v=4"></script>
 </body>
 </html>

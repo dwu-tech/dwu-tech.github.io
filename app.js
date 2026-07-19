@@ -312,7 +312,7 @@ let ALL = [];
 let PRS = {};
 let sortKey = 'date';
 let sortDir = -1; // newest first
-let view = 'table';
+let view = 'seasons';
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -450,7 +450,11 @@ function refreshChartEvents() {
   const rows = season ? ALL.filter((r) => r.season === season) : ALL;
   const counts = {};
   rows.forEach((r) => { if (r.event && r.value != null) counts[r.event] = (counts[r.event] || 0) + 1; });
-  const events = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+  const events = Object.keys(counts).sort((a, b) => {
+    const pri = (e) => e === '100m' ? 0 : e === '200m' ? 1 : 9;
+    if (pri(a) !== pri(b)) return pri(a) - pri(b);   // 100m, 200m first
+    return counts[b] - counts[a];                    // then most data points
+  });
   sel.innerHTML = '';
   for (const e of events) sel.add(new Option(`${e} (${counts[e]})`, e));
   sel.value = events.includes(prev) ? prev : (events[0] || '');
@@ -611,19 +615,22 @@ function renderChart() {
   }
 
   const isField = pts[0].field;
-  const W = 800, H = 340;
-  const pad = { l: 58, r: 18, t: 18, b: 44 };
-  const plotW = W - pad.l - pad.r, plotH = H - pad.t - pad.b;
+  const N = pts.length;
+  const H = 340;
+  const pad = { l: 58, r: 24, t: 18, b: 50 };
+  const gap = 56;                                   // horizontal px per performance
+  const plotW = Math.max((N - 1) * gap, 340);
+  const W = pad.l + pad.r + plotW;
+  const plotH = H - pad.t - pad.b;
+  pts.forEach((p, i) => { p._i = i; });
 
-  const xs = pts.map((p) => p.date.getTime());
   const ys = pts.map((p) => p.value);
-  let xMin = Math.min(...xs), xMax = Math.max(...xs);
   let yMin = Math.min(...ys), yMax = Math.max(...ys);
-  if (xMin === xMax) { xMin -= 8.64e7; xMax += 8.64e7; }
   const yPad = (yMax - yMin) * 0.12 || Math.max(0.1, yMax * 0.02);
   yMin -= yPad; yMax += yPad;
 
-  const xOf = (t) => pad.l + ((t - xMin) / (xMax - xMin)) * plotW;
+  // Equal spacing per performance (ordinal x) so closely-dated meets stay readable.
+  const xOf = (i) => pad.l + (N === 1 ? plotW / 2 : (i / (N - 1)) * plotW);
   const yOf = (v) => pad.t + (1 - (v - yMin) / (yMax - yMin)) * plotH;
 
   const yTicks = niceTicks(yMin, yMax, 5);
@@ -635,13 +642,12 @@ function renderChart() {
     grid += `<text class="chart-label" x="${pad.l - 8}" y="${(y + 3).toFixed(1)}" text-anchor="end">${lbl}</text>`;
   }
 
-  const years = [...new Set(pts.map((p) => p.date.getFullYear()))].sort();
+  // one date label per point
   let xLabels = '';
-  for (const yr of years) {
-    const mid = pts.filter((p) => p.date.getFullYear() === yr);
-    const avg = mid.reduce((a, p) => a + p.date.getTime(), 0) / mid.length;
-    xLabels += `<text class="chart-label" x="${xOf(avg).toFixed(1)}" y="${H - pad.b + 20}" text-anchor="middle">${yr}</text>`;
-  }
+  pts.forEach((p, i) => {
+    const lab = p.date.toLocaleDateString('en-US', { month: 'short' }) + " '" + String(p.date.getFullYear()).slice(2);
+    xLabels += `<text class="chart-label" x="${xOf(i).toFixed(1)}" y="${H - pad.b + 18}" text-anchor="middle">${lab}</text>`;
+  });
 
   // Trend line — segmented by season so seasons aren't connected to each other.
   const bySeason = {};
@@ -650,7 +656,7 @@ function renderChart() {
   for (const seasonPts of Object.values(bySeason)) {
     if (seasonPts.length < 2) continue; // a lone point needs no line
     const d = seasonPts
-      .map((p, i) => `${i ? 'L' : 'M'}${xOf(p.date.getTime()).toFixed(1)},${yOf(p.value).toFixed(1)}`)
+      .map((p, i) => `${i ? 'L' : 'M'}${xOf(p._i).toFixed(1)},${yOf(p.value).toFixed(1)}`)
       .join(' ');
     lines += `<path class="chart-line" d="${d}"/>`;
   }
@@ -661,9 +667,13 @@ function renderChart() {
     if (p.handTimed) cls.push('hand');
     if (p === best) cls.push('pr');
     else if (p.isSB) cls.push('sb');
-    circles += `<circle class="${cls.join(' ')}" cx="${xOf(p.date.getTime()).toFixed(1)}" cy="${yOf(p.value).toFixed(1)}" r="4.5" data-i="${i}"/>`;
+    circles += `<circle class="${cls.join(' ')}" cx="${xOf(p._i).toFixed(1)}" cy="${yOf(p.value).toFixed(1)}" r="4.5" data-i="${i}"/>`;
   });
 
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.style.width = W + 'px';
+  svg.style.height = H + 'px';
+  svg.style.maxWidth = 'none';
   svg.innerHTML =
     `<line class="chart-axis" x1="${pad.l}" y1="${pad.t}" x2="${pad.l}" y2="${H - pad.b}"/>` +
     `<line class="chart-axis" x1="${pad.l}" y1="${H - pad.b}" x2="${W - pad.r}" y2="${H - pad.b}"/>` +
@@ -685,7 +695,7 @@ function renderChart() {
     const p = pts[+c.dataset.i];
     const show = (e) => {
       const rect = wrap.getBoundingClientRect();
-      tip.style.left = (e.clientX - rect.left) + 'px';
+      tip.style.left = (e.clientX - rect.left + wrap.scrollLeft) + 'px';
       tip.style.top = (e.clientY - rect.top) + 'px';
       tip.innerHTML = `<strong>${p.mark}${p.wind ? ' ' + p.wind : ''}</strong>` +
         `${p.windAided ? ' <span style="color:#e67e22">wind-aided</span>' : ''}` +
