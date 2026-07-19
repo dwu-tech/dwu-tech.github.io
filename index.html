@@ -1,60 +1,129 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    
-    <title>Darren Wu </title>
-
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" 
-    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-
-    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="main.css" type="text/css"/>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Darren Wu · Track &amp; Field Results</title>
+    <meta name="description" content="Complete track and field meet results for Darren Wu — including meets not listed on Athletic.net." />
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="theme.js"></script>
 </head>
 <body>
-   <header>
-       <nav>
-           <ul>
-                <li class="logo"><a href = "index.html">Darren Wu</a></li>
-                <li><a href= "#about">About</a></li>
-                <li><a href="#education">Education</a></li>
-                <li><a href="#skills">Skills</a></li>
-           </ul>
-       </nav>
-       <h1>Darren Wu</h1>
-      
+    <header class="site-header">
+        <nav class="nav">
+            <a class="brand" href="index.html">Darren Wu</a>
+            <div class="nav-links">
+                <a href="index.html" class="active">Results</a>
+                <a href="about.html">About</a>
+                <a href="https://www.athletic.net/athlete/31853361/track-and-field/all" target="_blank" rel="noopener">Athletic.net</a>
+                <button id="theme-toggle" class="theme-btn" type="button" onclick="toggleTheme()" aria-label="Toggle dark mode">🌙</button>
+            </div>
+        </nav>
+    </header>
 
-   </header>
-   <section class="feature"> 
-       <div class = "about" id = "about"> 
-           <h2> Hello</h2>
-        <p>I'm a 3rd year student 
-              at the University of California Los Angeles
-        </p>
-       </div>
-       <div class = "education" id = "education"> 
-           <h2>Education</h2>
-           <ul>
-                <li>UCLA </li>
-                <li>2020-Present</li>
-                <p class= "course">Bachelors of Science: Computer Science
-                </p>
-               <p class = "course"> Data Structures, Algorithms, Operating Sytems, Computer Architecture
-               </p>
-            </ul>
-       </div>
-       <div class = "education" id = "skills"> 
-           <h2>Skills</h2>
-           <ul>
-                <p class = "course"> Python, Java, Ruby, C, C++, Javascript, HTML/CSS, Swift</p>
-                <p class = "course"> REST API, Ruby on Rails, Flask, PostgreSQL, Flutter, React, Git, Linux/Bash
-            </ul>
-       </div>
-       
-       <script src="scripts/main.js"></script>
-       <iframe frameborder=0 height=100% width=100% src="http://6stream.xyz/watch.php?postid=26917" allowfullscreen scrolling=no allowtransparency></iframe>
+    <main class="container">
+        <section class="card">
+            <h1>Track &amp; Field Results</h1>
+            <p class="subtitle">Every meet, every mark — the complete record, including meets that never made it onto Athletic.net.</p>
+            <div class="stats" id="stats"></div>
+        </section>
 
-       <footer>© 2022 Darren Wu. </footer>
-   </section>
-   
+        <!-- Loading -->
+        <div id="loading" class="card state">
+            <div class="spinner"></div>
+            <p>Loading results from the live spreadsheet…</p>
+        </div>
+
+        <!-- Error -->
+        <div id="error" class="card state hidden">
+            <p class="error">Couldn't load results.</p>
+            <p class="error-detail muted"></p>
+            <p class="muted">Make sure the Google Sheet is shared as “Anyone with the link → Viewer.”</p>
+        </div>
+
+        <!-- Content -->
+        <div id="content" class="hidden">
+          <div class="layout">
+            <div class="main">
+                <section class="card">
+                    <h2>Progression</h2>
+                    <div class="controls">
+                        <div class="control">
+                            <label for="c-event">Event</label>
+                            <select id="c-event"></select>
+                        </div>
+                        <div class="control">
+                            <label for="c-env">Type</label>
+                            <select id="c-env">
+                                <option value="">Indoor + Outdoor</option>
+                                <option value="Indoor">Indoor</option>
+                                <option value="Outdoor">Outdoor</option>
+                            </select>
+                        </div>
+                        <div class="control">
+                            <label for="c-season">Season</label>
+                            <select id="c-season"><option value="">All seasons</option></select>
+                        </div>
+                    </div>
+                    <div class="chart-wrap" id="chart-wrap">
+                        <div class="chart-tooltip hidden" id="chart-tooltip"></div>
+                        <svg id="chart" viewBox="0 0 800 340" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Performance progression chart"></svg>
+                    </div>
+                    <p class="note" id="chart-note"></p>
+                </section>
+
+                <section class="card">
+                    <div class="controls">
+                        <div class="control">
+                            <label for="f-event">Event</label>
+                            <select id="f-event"><option value="">All events</option></select>
+                        </div>
+                        <div class="control">
+                            <label for="f-season">Season</label>
+                            <select id="f-season"><option value="">All seasons</option></select>
+                        </div>
+                        <div class="control">
+                            <label for="f-env">Type</label>
+                            <select id="f-env">
+                                <option value="">Indoor + Outdoor</option>
+                                <option value="Indoor">Indoor</option>
+                                <option value="Outdoor">Outdoor</option>
+                            </select>
+                        </div>
+                        <div class="control">
+                            <label for="f-search">Search</label>
+                            <input type="search" id="f-search" placeholder="Meet, event, mark…" />
+                        </div>
+                        <div class="control">
+                            <label>View</label>
+                            <div class="toggle-group">
+                                <button data-view="table" class="active">Table</button>
+                                <button data-view="seasons">By season</button>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="note" id="result-count" style="margin-top:14px;"></p>
+                    <div id="results-area"></div>
+                </section>
+            </div>
+
+            <aside class="sidebar">
+                <section class="card pr-card">
+                    <h2>Personal Bests</h2>
+                    <div class="pr-list" id="pr-list"></div>
+                    <p class="note">Hand-timed marks (<code>h</code>) are excluded from PRs.</p>
+                </section>
+            </aside>
+          </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>© <span id="year"></span> Darren Wu · Data pulled live from Google Sheets</p>
+    </footer>
+
+    <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+    <script src="app.js"></script>
 </body>
 </html>
